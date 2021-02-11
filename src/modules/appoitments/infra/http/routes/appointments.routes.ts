@@ -2,9 +2,9 @@ import { Router } from 'express'
 import { getCustomRepository } from 'typeorm'
 import { parseISO } from 'date-fns'
 
-import AppoitmentsRepository from '../repositories/AppoitmentsRepository'
-import CreateAppointmentService from '../services/CreateAppointmentService'
-import ensureAuthenticated from '../middlewares/ensureAuthenticate'
+import AppoitmentsRepository from '@modules/appoitments/repositories/AppoitmentsRepository'
+import CreateAppointmentService from '@modules/appoitments/services/CreateAppointmentService'
+import ensureAuthenticated from '@modules/users/infra/http/middlewares/ensureAuthenticate'
 
 const appointmentsRouter = Router()
 
@@ -19,18 +19,18 @@ appointmentsRouter.get('/', async (request, response) => {
 })
 
 appointmentsRouter.post('/', async (request, response) => {
-    const { provider_id, date } = request.body
+  const { provider_id, date } = request.body
 
-    const parsedDate = parseISO(date)
+  const parsedDate = parseISO(date)
 
-    const createAppointment = new CreateAppointmentService()
+  const createAppointment = new CreateAppointmentService()
 
-    const appointment = await createAppointment.execute({
-      date: parsedDate,
-      provider_id: provider_id,
-    })
+  const appointment = await createAppointment.execute({
+    date: parsedDate,
+    provider_id: provider_id,
+  })
 
-    response.json(appointment)
+  response.json(appointment)
 })
 
 export default appointmentsRouter

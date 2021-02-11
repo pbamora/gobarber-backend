@@ -1,8 +1,8 @@
 import { getRepository } from 'typeorm'
-import User from '../models/Users'
+import User from '@modules/users/infra/typeorm/entities/Users'
 import { sign } from 'jsonwebtoken'
-import authConfig from '../config/auth'
-import AppError from '../errors/appError'
+import authConfig from '@config/auth'
+import AppError from '@shared/errors/AppError'
 
 import { compare } from 'bcryptjs'
 
@@ -15,7 +15,6 @@ interface Response {
   user: User
   token: string
 }
-
 
 class AuthenticateUserService {
   public async execute({ email, password }: Request): Promise<Response> {
@@ -41,7 +40,7 @@ class AuthenticateUserService {
       throw new AppError('Incorrect email/password combination', 401)
     }
 
-    // Criamos o token do usuário e passamos o id do usuário como sub do token para 
+    // Criamos o token do usuário e passamos o id do usuário como sub do token para
     // saber qual usuário gerou o token
     const token = sign({}, authConfig.jwt.secret, {
       subject: user.id,

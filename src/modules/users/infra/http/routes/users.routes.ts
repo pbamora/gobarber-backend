@@ -5,6 +5,7 @@ import uploadConfig from '../../../../../config/Upload'
 import UpdateUserAvatarService from '@modules/users/services/UpdateUserAvatarService'
 
 import ensureAuthenticated from '../middlewares/ensureAuthenticate'
+import UsersRepository from '../../typeorm/repositories/UserRepository'
 
 const userRoute = Router()
 
@@ -20,9 +21,10 @@ const upload = multer(uploadConfig)
 userRoute.post('/', async (request, response) => {
   // buscando informações no corpo
   const { name, email, password } = request.body
+  const userRepository = new UsersRepository()
 
   // fazendo uma instancia do serviço de criação de usuário
-  const createrUser = new CreateUserService()
+  const createrUser = new CreateUserService(userRepository)
 
   // utilizando o metodo execute do serviço para criar o usuário
   //passando as informações do corpo como parametro
@@ -48,8 +50,9 @@ userRoute.patch(
   ensureAuthenticated,
   upload.single('avatar'),
   async (request, response) => {
+    const userRepository = new UsersRepository()
     // Pegamos a instância do nosso serviço
-    const updateUserAvatar = new UpdateUserAvatarService()
+    const updateUserAvatar = new UpdateUserAvatarService(userRepository)
 
     // Passamos os parametros da request para o nosso método execute dentro do service
     const user = await updateUserAvatar.execute({

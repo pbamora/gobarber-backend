@@ -1,8 +1,8 @@
 import { Response, Request, NextFunction } from 'express'
 import { verify } from 'jsonwebtoken'
-import authConfig from '../config/auth'
+import authConfig from '@config/auth'
 
-import AppError from '../errors/appError'
+import AppError from '@shared/errors/AppError'
 
 interface TokenPayload {
   iat: number
@@ -16,7 +16,6 @@ export default function ensureAuthenticated(
   response: Response,
   next: NextFunction,
 ): void {
-
   // Pegando o bearer + token que vem no header da request
   const authHeader = request.headers.authorization
 
@@ -25,7 +24,7 @@ export default function ensureAuthenticated(
     throw new AppError('JWT token is missing', 401)
   }
 
- // Desestruturamos o bearer + token para pegar somente token
+  // Desestruturamos o bearer + token para pegar somente token
   const [, token] = authHeader.split(' ')
 
   try {
@@ -40,7 +39,7 @@ export default function ensureAuthenticated(
     request.user = {
       id: sub,
     }
-    
+
     console.log(request.user.id)
 
     return next()

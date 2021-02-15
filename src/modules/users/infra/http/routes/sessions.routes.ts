@@ -1,6 +1,8 @@
 import AuthenticateUserService from '@modules/users/services/AuthenticaUserService'
 import { Router } from 'express'
+import { container } from 'tsyringe'
 import User from '../../typeorm/entities/Users'
+import UsersRepository from '../../typeorm/repositories/UsersRepository'
 
 const sessionsRouter = Router()
 
@@ -9,7 +11,7 @@ sessionsRouter.post('/', async (request, response) => {
   const { email, password } = request.body
 
   // fazemos uma instancia do serviço de autenticação
-  const authenticateUser = new AuthenticateUserService()
+  const authenticateUser = container.resolve(AuthenticateUserService)
 
   // fazemos uma desestruturação e pegamos o usuário e seu token
   // Passamos o seu email e senha para o serviço

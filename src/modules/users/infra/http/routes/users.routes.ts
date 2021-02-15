@@ -5,6 +5,8 @@ import uploadConfig from '@config/Upload'
 import UpdateUserAvatarService from '@modules/users/services/UpdateUserAvatarService'
 
 import ensureAuthenticated from '@modules/users/infra/http/middlewares/ensureAuthenticate'
+import UsersRepository from '../../typeorm/repositories/UsersRepository'
+import { container } from 'tsyringe'
 
 const userRoute = Router()
 
@@ -22,7 +24,7 @@ userRoute.post('/', async (request, response) => {
   const { name, email, password } = request.body
 
   // fazendo uma instancia do serviço de criação de usuário
-  const createUser = new CreateUserService()
+  const createUser = container.resolve(CreateUserService)
 
   // utilizando o metodo execute do serviço para criar o usuário
   //passando as informações do corpo como parametro
@@ -49,7 +51,7 @@ userRoute.patch(
   upload.single('avatar'),
   async (request, response) => {
     // Pegamos a instância do nosso serviço
-    const updateUserAvatar = new UpdateUserAvatarService()
+    const updateUserAvatar = container.resolve(UpdateUserAvatarService)
 
     // Passamos os parametros da request para o nosso método execute dentro do service
     const user = await updateUserAvatar.execute({

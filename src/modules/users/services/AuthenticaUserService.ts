@@ -1,5 +1,3 @@
-import { getRepository } from 'typeorm'
-
 import User from '@modules/users/infra/typeorm/entities/Users'
 import { sign } from 'jsonwebtoken'
 import authConfig from '@config/auth'
@@ -7,26 +5,28 @@ import AppError from '@shared/errors/AppError'
 
 import { compare } from 'bcryptjs'
 import IUsersRepository from '../repositories/IUserRepository'
+import { inject, injectable } from 'tsyringe'
 
-interface Request {
+interface IRequest {
   email: string
   password: string
 }
 
-interface Response {
+interface IResponse {
   user: User
   token: string
 }
 
+@injectable()
 class AuthenticateUserService {
-  public async execute({ email, password }: Request): Promise<Response> {
-    // pegamos o collection de usuarios
-    const usersRepo = getRepository(User)
-
+  constructor(
+    @inject('UsersRepository')
+    private usersRepository: IUsersRepository,
+  ) {}
+  
+  public async execute({ email, password }: IRequest): Promise<IResponse> {
     // fazemos a verificação do usuário
-    const user = await usersRepo.findOne({
-      where: email,
-    })
+    const user = await this.usersRepository.findByEmail(email)
 
     // se ele não existir mandamos um erro
     if (!user) {

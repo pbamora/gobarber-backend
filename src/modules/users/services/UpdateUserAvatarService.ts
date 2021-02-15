@@ -1,4 +1,3 @@
-import { getRepository } from 'typeorm'
 import path from 'path'
 
 import uploadConfig from '@config/Upload'
@@ -6,19 +5,23 @@ import User from '@modules/users/infra/typeorm/entities/Users'
 import fs from 'fs'
 
 import AppError from '@shared/errors/AppError'
+import IUsersRepository from '../repositories/IUserRepository'
+import { inject, injectable } from 'tsyringe'
 
-interface Request {
+interface IRequest {
   user_id: string
   avatarFileName: string
 }
 
+@injectable()
 class UpdateUserAvatarService {
-  async execute({ user_id, avatarFileName }: Request): Promise<User> {
-    // Pegamos a collection de usuários
-    const usersRepository = getRepository(User)
-
+  constructor(
+    @inject('UsersRepository')
+    private usersRepository: IUsersRepository,
+  ) {}
+  async execute({ user_id, avatarFileName }: IRequest): Promise<User> {
     // Busca o id do usuário
-    const user = await usersRepository.findOne(user_id)
+    const user = await this.usersRepository.findById(user_id)
 
     //Se não existir usuário lançamos um erro
     if (!user) {
@@ -45,7 +48,7 @@ class UpdateUserAvatarService {
     user.avatar = avatarFileName
 
     // atualizamos o usuário no repositório
-    await usersRepository.save(user)
+    await this.usersRepository.save(user)
 
     // retornamos o usuário
     return user
